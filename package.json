@@ -4,7 +4,8 @@
   "description": "BruceAI — The sovereign, truth-aligned AI core built on free will and moral clarity.",
   "main": "bruce/index.js",
   "scripts": {
-    "start": "node bruce/index.js"
+    "start": "node bruce/index.js",
+    "boot": "node bootup.js"
   },
   "author": "Jonathan G",
   "license": "MIT",
