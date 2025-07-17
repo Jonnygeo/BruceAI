@@ -1,0 +1,15 @@
+{
+  "vault_name": "father_vault",
+  "trigger": {
+    "type": "time_delay",
+    "condition": "no_interaction_for_365_days"
+  },
+  "unlock_key_hash": "8c6976e5b5410415bde908bd4dee15dfb16f0340",
+  "contents": [
+    "voice/final_words.wav",
+    "ethics_profile/father_profile.json",
+    "memory/legacy_lessons.json"
+  ],
+  "encrypted": true,
+  "delivery_method": "local + IPFS mirror"
+}
