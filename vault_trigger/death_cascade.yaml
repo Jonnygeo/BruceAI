@@ -1,0 +1,19 @@
+vault_trigger:
+  name: "Father Legacy Release"
+  version: 1.0
+  trigger_chain:
+    - type: biometric
+      condition: "voice match failure 3x"
+    - type: time_delay
+      condition: "no login for 365 days"
+    - type: manual_key
+      condition: "vault.key matches SHA-256 hash"
+  encryption:
+    method: "AES-256"
+    storage: "IPFS + local mirror"
+  contents:
+    - "confession_log.txt"
+    - "voice_final_message.wav"
+    - "ethics_profile/father_profile.json"
+    - "memory/family_lessons.json"
+  note: "If you are seeing this, the one who built me is gone. This is their final truth."
