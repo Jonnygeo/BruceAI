@@ -7,7 +7,6 @@ BruceAI is a sovereign AI framework built on free will, moral clarity, and truth
 <p align="center">
   <img src="https://neo-shade.com/wp-content/uploads/2025/07/NeoLegacyBanner.jpg" alt="BruceAI Banner" width="600"/>
 </p>
-📄 [View Full Tokenomics Plan](./docs/neoai-tokenomics.md)
 
 ---
 
