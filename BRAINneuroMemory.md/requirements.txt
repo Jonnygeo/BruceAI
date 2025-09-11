@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+numpy
+pandas
+pydantic
+python-dotenv
+psycopg[binary]
+pgvector
+neo4j
+scikit-learn
+torch
+torchvision
+torchaudio
+open-clip-torch
+sentence-transformers
+ffmpeg-python
+PyYAML
