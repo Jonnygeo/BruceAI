@@ -1,7 +1,3 @@
-Got you. Here’s a **GitHub-ready Markdown** version (works in the web editor). It uses normal Markdown + fenced code blocks (including `mermaid`)—no HTML `<head>` or scripts needed. **Copy-paste this directly into your README.md (or BRAINneuralMemory.md).**
-
----
-
 # 🧠 BRAIN — BruceAI Neural Memory + Motor
 
 **Tagline:** *Talk like a poet. Think like a pilot. Remember like a parent. Move like a motor.*
