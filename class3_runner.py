@@ -3,14 +3,17 @@ import os, json, csv, math, random
 import numpy as np
 
 # ---- JSON encoder to avoid NumPy bool/float issues ----
-class NpEncoder(json.JSONEncoder):
-    def default(self, obj):
-        import numpy as np
-        if isinstance(obj, np.bool_):      return bool(obj)
-        if isinstance(obj, np.integer):    return int(obj)
-        if isinstance(obj, np.floating):   return float(obj)
-        if isinstance(obj, np.ndarray):    return obj.tolist()
-        return super().default(obj)
+def to_py(o):
+    import numpy as np
+    if isinstance(o, dict):   return {k: to_py(v) for k,v in o.items()}
+    if isinstance(o, list):   return [to_py(x) for x in o]
+    if isinstance(o, tuple):  return tuple(to_py(x) for x in o)
+    if isinstance(o, np.bool_):     return bool(o)
+    if isinstance(o, np.integer):   return int(o)
+    if isinstance(o, np.floating):  return float(o)
+    if isinstance(o, np.ndarray):   return o.tolist()
+    return o
+
 
 # ---------- Utils ----------
 def set_seed(s):
@@ -290,4 +293,5 @@ if __name__ == "__main__":
 
     # Run and report
     report = run_class3(ints, cfg, task, log_path=os.path.join(runs_dir, "run1.csv"))
-    print(json.dumps(report, indent=2, cls=NpEncoder))
+    print(json.dumps(to_py(report), indent=2))
+
