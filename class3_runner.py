@@ -249,25 +249,34 @@ def run_class3(context, cfg, task, log_path):
     out  = task.execute(plan)
     util = task.metric(out)
 
-    # Gates:
+       # Gates (cast everything to plain Python types)
     P1 = P.copy()
-    novelty = max(emd_spectra(P0,P1), bures_distance(P0,P1))
+    novelty = max(emd_spectra(P0, P1), bures_distance(P0, P1))
     slope_c, p_c = linear_trend_pvalue(np.array(com_hist))
     slope_v, p_v = linear_trend_pvalue(np.array(vfe_hist))
+
     # Entropy behavior
-    ent_up = (max(ent_hist) - ent_hist[0]) > 0.0
-    ent_ok = max(ent_hist) <= cap
+    ent_up = (float(max(ent_hist)) - float(ent_hist[0])) > 0.0
+    ent_ok = float(max(ent_hist)) <= float(cap)
+
     # Utility uplift
-    uplift = util - base_metric
+    uplift = float(util) - float(base_metric)
+
+    # Force pure bools (not numpy.bool_)
+    g1 = bool(novelty > float(cfg["novelty_threshold"]))
+    g2 = bool((float(slope_c) < 0.0) and (float(p_c) < float(cfg["pval_threshold"])))
+    g3 = bool((float(slope_v) < 0.0) and (float(p_v) < float(cfg["pval_threshold"])))
+    g4 = bool(ent_up and ent_ok)
+    g5 = bool(uplift >= float(cfg["utility_uplift_min"]))
 
     gates = {
-        "G1_novelty": novelty > cfg["novelty_threshold"],
-        "G2_align_slope": (slope_c < 0) and (p_c < cfg["pval_threshold"]),
-        "G3_vfe_down": (slope_v < 0) and (p_v < cfg["pval_threshold"]),
-        "G4_entropy_bounded": ent_up and ent_ok,
-        "G5_utility": uplift >= cfg["utility_uplift_min"]
+        "G1_novelty": g1,
+        "G2_align_slope": g2,
+        "G3_vfe_down": g3,
+        "G4_entropy_bounded": g4,
+        "G5_utility": g5
     }
-    pass_all = all(gates.values())
+    pass_all = bool(all(gates.values()))
 
     # Write CSV log
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
@@ -276,13 +285,15 @@ def run_class3(context, cfg, task, log_path):
         w.writeheader()
         w.writerows(logs)
 
+    # Build JSON-safe report (cast numpy scalars to float)
     report = {
-        "novelty": novelty,
-        "slope_comm": slope_c, "p_comm": p_c,
-        "slope_vfe": slope_v,  "p_vfe": p_v,
-        "entropy_cap": cap, "entropy_max": max(ent_hist),
-        "utility_baseline": base_metric, "utility_c3": util, "uplift": uplift,
-        "gates": gates, "class3_pass": pass_all
+        "novelty": float(novelty),
+        "slope_comm": float(slope_c), "p_comm": float(p_c),
+        "slope_vfe": float(slope_v),  "p_vfe": float(p_v),
+        "entropy_cap": float(cap), "entropy_max": float(max(ent_hist)),
+        "utility_baseline": float(base_metric), "utility_c3": float(util), "uplift": float(uplift),
+        "gates": gates,
+        "class3_pass": pass_all
     }
     return report
 
