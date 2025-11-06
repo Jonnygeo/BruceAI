@@ -333,6 +333,6 @@ if __name__ == "__main__":
     os.makedirs(runs_dir, exist_ok=True)
 
     # Run and report
-    report = run_class3(ints, cfg, task, log_path=os.path.join(runs_dir, "run1.csv"))
-  print(json.dumps(report, indent=2, cls=NpEncoder))
+report = run_class3(ints, cfg, task, log_path=os.path.join(runs_dir, "run1.csv"))
+print(json.dumps(report, indent=2, cls=NpEncoder))
 
