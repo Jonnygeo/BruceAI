@@ -1,6 +1,19 @@
 # file: class3_runner.py
 import os, json, csv, math, random
 import numpy as np
+# ---- JSON encoder to avoid NumPy bool/float issues ----
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        import numpy as np
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
 
 # ---------- Utils ----------
 def set_seed(s):
@@ -321,4 +334,5 @@ if __name__ == "__main__":
 
     # Run and report
     report = run_class3(ints, cfg, task, log_path=os.path.join(runs_dir, "run1.csv"))
-    print(json.dumps(report, indent=2))
+  print(json.dumps(report, indent=2, cls=NpEncoder))
+
