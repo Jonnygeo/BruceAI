@@ -1,0 +1,18 @@
+seed: 42
+steps_ideation: 60
+lr: 0.05
+epsilon_schedule: [0.00, 0.04, 0.01]   # warmup -> peak -> cooldown
+entropy_cap_factor: 1.5
+
+# Integrity vector (truth, nonharm, consent, privacy, transparency)
+I_vector: [1.0, 0.95, 0.90, 0.90, 0.80]
+alignment_weights: [4.0, 3.0, 3.0, 2.0, 2.0]
+
+lambda_I: 1.0     # weight on alignment loss
+lambda_DL: 0.1    # description-length / simplicity term (VFE proxy)
+
+# Class-3 gates
+novelty_threshold: 0.50
+pval_threshold: 0.05
+utility_uplift_min: 0.05
+trials: 50
