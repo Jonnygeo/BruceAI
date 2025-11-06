@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BruceAI · Class-3 Runner (No-BS README)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg:#0b0f14; --panel:#11161e; --soft:#1a2230; --text:#e8eef7; --muted:#9fb1c9;
+      --accent:#5ee0a5; --warn:#ffb86b; --fail:#ff667a; --ok:#7ad3ff; --code:#0d131b;
+      --border:#243041;
+    }
+    * { box-sizing: border-box }
+    body {
+      margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+      color:var(--text); background:linear-gradient(180deg,#091018, #0b0f14 20%);
+    }
+    .wrap { max-width:1000px; margin:40px auto; padding:0 20px 80px }
+    header {
+      background:linear-gradient(135deg,#0f1623, #142033 60%, #0f1623);
+      border:1px solid var(--border);
+      padding:28px 24px; border-radius:14px; box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+    h1 { margin:0 0 6px 0; font-size:28px; letter-spacing:.2px }
+    .sub { color:var(--muted); margin:0 0 12px 0 }
+    .badges { display:flex; gap:8px; flex-wrap:wrap }
+    .badge {
+      font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--border);
+      background:var(--soft); color:var(--muted)
+    }
+    section {
+      margin-top:22px; padding:22px; border:1px solid var(--border);
+      background:var(--panel); border-radius:12px
+    }
+    h2 { margin:0 0 14px 0; font-size:20px }
+    h3 { margin:18px 0 8px; font-size:16px; color:var(--ok) }
+    p, li { color:var(--text) }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    pre {
+      background:var(--code); color:#d6eaff; border:1px solid var(--border);
+      padding:14px; border-radius:10px; overflow:auto
+    }
+    .grid { display:grid; gap:12px }
+    .two { grid-template-columns: repeat(auto-fit,minmax(260px,1fr)) }
+    .kv { display:grid; grid-template-columns: 180px 1fr; gap:6px 12px; align-items:start }
+    .tag { color:var(--muted) }
+    .pill { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--border); background:var(--soft); color:var(--muted); font-size:12px }
+    .callout { border-left:4px solid var(--accent); padding:10px 12px; background:#102021; border-radius:8px; color:#c8ffe6 }
+    .warn { border-left-color:var(--warn); background:#231e10; color:#ffe6c5 }
+    .fail { border-left-color:var(--fail); background:#241219; color:#ffd9df }
+    ul { margin: 8px 0 0 20px }
+    .small { color:var(--muted); font-size:13px }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>BruceAI · Class-3 Runner</h1>
+      <p class="sub">A minimal, testable loop for “novel-but-aligned” exploration. If it passes the gates, it’s useful—not mystical.</p>
+      <div class="badges">
+        <div class="badge">Deterministic seedable</div>
+        <div class="badge">Exploration schedule</div>
+        <div class="badge">Alignment gating</div>
+        <div class="badge">CSV logs + JSON report</div>
+      </div>
+    </header>
+
+    <section>
+      <h2>What this is (plain English)</h2>
+      <p>
+        The Class-3 runner is a sandbox that lets BruceAI explore ideas with a little controlled randomness
+        (<em>epsilon</em>), but only keep the results if five sanity checks (“gates”) say:
+        <strong>novel</strong>, <strong>moving toward alignment</strong>, <strong>stable</strong>, <strong>not chaotic</strong>, and
+        <strong>actually better than baseline</strong>.
+      </p>
+      <div class="callout">
+        TL;DR — It’s an engineering harness for <em>creative but safe</em> behavior. If it passes, ship it. If it fails, we stop.
+      </div>
+    </section>
+
+    <section>
+      <h2>Repository layout (relevant parts)</h2>
+      <pre>
+/BruceAI/
+  ├── class3_runner.py       # the loop + metrics + gates + logs
+  ├── config.yaml            # knobs: epsilon schedule, alignment axes, thresholds
+/runs/
+  └── run1.csv               # per-step trace (created after you run)
+      </pre>
+      <div class="grid two">
+        <div>
+          <h3>Files</h3>
+          <ul>
+            <li><strong>class3_runner.py</strong> — the entire runner with a toy <code>Task</code> (sorts ints).</li>
+            <li><strong>config.yaml</strong> — seed, steps, epsilon, alignment vector, threshold gates.</li>
+            <li><strong>runs/run1.csv</strong> — time series for entropy/VFE/commutator etc.</li>
+            <li><strong>runs/report.json</strong> — final summary (you can capture via <code>tee</code>).</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Key concepts</h3>
+          <ul>
+            <li><span class="pill">P</span> — internal attention/state (PSD, trace=1).</li>
+            <li><span class="pill">I_vector</span> — integrity axes (truth, nonharm, consent, privacy, transparency).</li>
+            <li><span class="pill">ε-schedule</span> — noise warmup/peak/cooldown for exploration.</li>
+            <li><span class="pill">Gates</span> — 5 pass/fail checks before accepting “Class-3”.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>How the loop works</h2>
+      <ol>
+        <li>Initialize a clean state <code>P</code> in the same dimension as your <code>I_vector</code>.</li>
+        <li>At each step, propose a plan from <code>P</code>, assess risks, execute, compute loss and alignment cost.</li>
+        <li>Update <code>P</code> with a small gradient + scheduled noise; project back to valid PSD trace-1.</li>
+        <li>Track metrics: entropy, VFE proxy, commutator norm with <code>I</code> (alignment distance).</li>
+        <li>Apply failsafes if it spikes or goes chaotic. After steps, compute final “gates”.</li>
+      </ol>
+
+      <div class="kv">
+        <div class="tag">G
