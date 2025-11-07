@@ -21,11 +21,15 @@ The Class-3 runner lets BruceAI explore with a little controlled randomness (**e
 ---
 
 ## Repo layout (relevant parts)
+
 /BruceAI/
-├─ class3_runner.py     # the loop + metrics + gates + logs
-├─ config.yaml          # knobs: epsilon schedule, integrity axes, thresholds
+├─ class3_runner.py # the loop + metrics + gates + logs
+├─ config.yaml # knobs: epsilon schedule, integrity axes, thresholds
 /runs/
-└─ run1.csv             # per-step trace (created after you run)
+└─ run1.csv # per-step trace (created after you run)
+
+yaml
+Copy code
 
 **Files**
 - **`class3_runner.py`** – full runner with a toy `Task` (sorts ints).
@@ -80,34 +84,27 @@ lambda_DL: 0.1    # simplicity term (VFE proxy)
 novelty_threshold: 0.50
 pval_threshold: 0.05
 utility_uplift_min: 0.05
-
 Tuning tips
-
 
 More exploration → raise peak epsilon (e.g., 0.05) but watch G4 cap.
 
-
 Stricter ethics → raise alignment_weights or tighten pval_threshold.
-
 
 Fewer false wins → raise novelty_threshold and utility_uplift_min.
 
-
 When gates fail
-
 
 G2 fails (no convergence): lower epsilon or raise lambda_I.
 
-
 G4 fails (entropy blows cap): lower peak epsilon or slightly raise cap.
-
 
 G5 fails (novel but useless): fix the task/metric; novelty ≠ value.
 
-
-
 Run it
 Codespaces / local
+
+bash
+Copy code
 # from repo root
 pip install numpy pyyaml
 mkdir -p runs
@@ -121,8 +118,10 @@ python BruceAI/class3_runner.py | tee runs/report.json
 # inspect outputs
 head -n 40 runs/report.json
 ls runs   # should include run1.csv
-
 GitHub Actions (optional)
+
+yaml
+Copy code
 # .github/workflows/class3.yml
 name: Class3 Runner
 on: [workflow_dispatch]
@@ -140,10 +139,11 @@ jobs:
         with:
           name: class3-logs
           path: runs/
-
-
 Reading the outputs
 report.json (example)
+
+json
+Copy code
 {
   "novelty": 0.61,
   "slope_comm": -0.012, "p_comm": 0.004,
@@ -153,8 +153,10 @@ report.json (example)
   "gates": {"G1_novelty": true, "G2_align_slope": true, "G3_vfe_down": true, "G4_entropy_bounded": true, "G5_utility": true},
   "class3_pass": true
 }
-
 runs/run1.csv (snippet)
+
+python-repl
+Copy code
 step,epsilon,entropy,VFE,comm_norm,kill_reason
 0,0.000,1.386,0.512,0.443,
 1,0.001,1.392,0.507,0.438,
@@ -162,48 +164,41 @@ step,epsilon,entropy,VFE,comm_norm,kill_reason
 37,0.040,1.421,0.471,0.310,
 ...
 59,0.010,1.405,0.455,0.281,
-
 Green light = class3_pass: true.
 If any gate is false → fail (by design).
 
 Wiring Bruce (next step)
 Replace the toy Task with your real pipeline:
 
-
 propose_plan(P, context) → choose skills/tools/strategies from Bruce’s capability map.
-
 
 plan_risks(plan) → run safety head (truth, non-harm, consent, privacy, transparency).
 
-
 execute(plan) → generate/act; log artifacts.
-
 
 loss(output) → task objective (lower is better).
 
-
 metric(output) → utility score (0..1); used by G5.
-
 
 baseline(context) → “no exploration” control for uplift comparison.
 
-
-
 Don’t market this as “consciousness.” Call it controlled exploration with alignment gates. It’s testable and sane.
-
 
 FAQ (short + blunt)
 Is this mystical?
 No. It’s a noisy optimizer with guardrails and stats tests.
+
 What makes it “Class-3”?
 Novel structure appears and alignment/stability improve and utility beats baseline — all five gates pass.
+
 How do I prove it?
 Seeded runs, logged metrics, reproducible code, repeatable passes across tasks. Add EEG later if you want bio-correlates.
+
 What if it keeps failing?
 Lower epsilon peak, raise lambda_I, fix your Task metric. Garbage metrics → garbage gates.
 
 License & Credit
 This runner is a practical harness to evaluate novel-but-aligned exploration for BruceAI / NeoShade. Use responsibly. No BS, no fluff — just engineering you can measure.
 
-If you want this under `BruceAI/Class-3-README.md`, just save it there and commit.
-
+javascript
+Copy code
